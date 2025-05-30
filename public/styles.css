@@ -589,9 +589,24 @@ footer{
     padding-left: 12%;
   }
 }
+@media (max-width: 433px) {
+  .down{
+    padding-left: 4%;
+  }
+}
 @media (max-width: 426px) {
   .down{
     padding-left: 9%;
+  }
+}
+@media (max-width: 419px) {
+  .down{
+    padding-left: 2%;
+  }
+}
+@media (max-width: 384px) {
+  .down{
+    padding-left: 1%;
   }
 }
 
