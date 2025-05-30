@@ -1,0 +1,80 @@
+<%- include("partials/header.ejs"); %>
+
+<h2>Review for "<%= book.title %>"</h2>
+
+<div class="read-review-container">
+    <div class="download-wrapper">
+        <button id="download-btn" class="download-btn" title="Download Review"><img class="d-btn" src="download.svg" alt="dwn-icon" /> to Share.</button>
+    </div>
+    <div class="book-image img">
+        <img src="<%= book.cover_url %>" alt="<%= book.title %>" crossorigin="anonymous">
+    </div>
+
+    <div class="review-content">
+        <h3><%= book.title %></h3>
+        <p><strong>Author:</strong><%= book.author %></p>
+        <p><strong>My Rating:</strong>
+            <% for (let i = 1; i <= 5; i++) { %>
+                <% if (i <= book.rating) { %>
+                    ★
+                <% } else { %>
+                    ☆
+                 <% } %>
+            <% } %>
+        </p>
+        <p class="review-text"><%- review.content.replace(/\r?\n/g, '<br>') %></p>
+        <div class="review-timestamp">
+            <p>Created: <%= new Date(review.created_at).toLocaleString() %></p>
+                <% if (review.created_at !== review.updated_at) { %>
+            <p>Updated: <%= new Date(review.updated_at).toLocaleString() %></p>
+            <% } %>
+        </div>
+        <a href="/edit-review?key=<%= book.openlibrary_key %>" class="edit-bt">Edit Review</a>
+        <a href="/delete-review?key=<%= book.openlibrary_key %>" class="delete-bt" onclick="return confirm ('Are you sure you want to delete review')">Delete Review</a>
+    </div>
+</div>
+
+<%- include("partials/footer.ejs"); %>
+
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const downloadBtn = document.getElementById("download-btn");
+    const reviewContainer = document.querySelector(".read-review-container");
+    const bookImage = reviewContainer.querySelector(".book-image img");
+    const editBtn = document.querySelector(".edit-bt");
+    const deleteBtn = document.querySelector(".delete-bt");
+
+    function captureScreenshot() {
+        // Hide edit and delete buttons temporarily
+        editBtn.style.display = 'none';
+        deleteBtn.style.display = 'none';
+        downloadBtn.style.display = 'none';
+
+        setTimeout(() => {
+            html2canvas(reviewContainer, {useCORS: true }).then(canvas => {
+                const link = document.createElement("a");
+                link.href = canvas.toDataURL('image/jpeg');
+                link.download = 'review for <%= book.title %>.jpg';
+                link.click();
+
+                // Restore buttons after screenshot
+                editBtn.style.display = '';
+                deleteBtn.style.display = '';
+                downloadBtn.style.display = '';
+            });
+        }, 100); // Short delay to apply style changes
+    }
+
+    downloadBtn.addEventListener('click', function () {
+        if (bookImage.complete && bookImage.naturalHeight !== 0) {
+            captureScreenshot();
+        } else {
+            bookImage.onload = () => captureScreenshot();
+            bookImage.onerror = () => {
+                alert("Failed to load image. Please try again.");
+            };
+        }
+    });
+});
+</script>
