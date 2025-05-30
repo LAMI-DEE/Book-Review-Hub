@@ -8,11 +8,13 @@ import passport from "passport";
 import { Strategy } from "passport-local";
 import GoogleStrategy from "passport-google-oauth2";
 import session from "express-session";
+import pgSession from "connect-pg-simple";
 import flash from "connect-flash";
 
 const app = express();
 const port = process.env.PORT || 3000;
 const saltRounds = 10;
+const PgStore = pgSession(session);
 env.config();
 
 const db = process.env.DATABASE_URL
@@ -39,6 +41,10 @@ function ensureAuthenticated(req,res, next){
 
 app.use(
   session({
+    store: new PgStore({
+        pool: db, 
+        tableName: 'session' 
+    }),
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
